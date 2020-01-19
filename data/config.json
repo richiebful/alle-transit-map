@@ -1,0 +1,13 @@
+{
+  "mongoUrl": "mongodb://localhost:27017/gtfs",
+  "agencies": [
+    {
+      "agency_key": "BCTA",
+      "url": "/C/Users/fulopr/Documents/Fulop/port-authority/data/raw/beaver_transit.zip"
+    }
+  ],
+  "includeStops": true,
+  "outputType": "route",
+  "coordinatePrecision": 6,
+  "zipOutput": false
+}
