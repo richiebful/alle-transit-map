@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Login Page</h1>
+<form action="/signup" method="post">
+<label>Email address:</label><br/>
+  <input type="text" name="email" placeholder="you@mail.com"/><br>
+  Password:<br/>
+  <input type="password" name="password"/><br/>
+  Confirm password:<br/>
+  <input type="password" name="confirm_password"/><br/>
+  <input type="submit" value="Submit">
+</form>
+{% endblock %}
