@@ -1,5 +1,7 @@
 CREATE DATABASE transit;
 
+\c transit;
+
 CREATE SCHEMA gtfs;
 
 CREATE TABLE agency (
