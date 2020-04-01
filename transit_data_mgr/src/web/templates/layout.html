@@ -10,8 +10,10 @@
       width: 1.0em;
     }
   </style>
+  {% block style %}{% endblock %}
   <script src="/js/jquery.min.js"></script>
   <script src="/js/bootstrap.min.js"></script>
+  {% block javascript %}{% endblock %}
 </head>
 
 <body>
@@ -47,13 +49,6 @@
             </li>
           </ul>
     </nav>
-    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
-      <h1 class="display-5 font-weight-normal">Modern transit needs modern data practices</h1>
-      <img src="/img/tram-icon.svg" height="64" alt="Bus icon"/>
-      <img src="/img/bus-icon.svg" height="64" alt="Bus icon"/>
-      <img src="/img/rail-icon.svg" height="64" alt="Train icon"/>
-    </div>
-  </header>
   {% block content %}{% endblock %}
 </body>
 

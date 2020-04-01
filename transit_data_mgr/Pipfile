@@ -7,7 +7,9 @@ verify_ssl = true
 
 [packages]
 flask = "*"
-pyodbc = "*"
+psycopg2 = "*"
+dotenv = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.7"
