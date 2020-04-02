@@ -3,10 +3,11 @@ import flask
 import hashlib
 import os
 import psycopg2
+import logging
 
 connection = psycopg2.connect(os.getenv('DATABASE_CONNSTRING'))
 app = flask.Flask(__name__, static_url_path='')
-#TODO remove connstring
+app.secret_key = os.getenv('APPLICATION_SECRET')
 
 @app.route('/')
 def index():
@@ -16,19 +17,33 @@ def index():
 def get_login():
     return flask.render_template('login.html')
 
+@app.route('/dashboard')
+def dashboard():
+    return flask.render_template('dashboard.html')
+
 @app.route('/login', methods=['POST'])
 def post_login():
-    form = flask.request.form
-    cursor = connection.cursor()
-    cursor.execute('''SELECT salt, password_hash
-                      FROM user_account
-                      WHERE email_address = %s''', (form['email'],))
-    #TODO first check if user exists
-    salt, stored_hash = cursor.fetchone()
-    if salt and auth.check_password_hash(stored_hash, form['password'], salt):
-        return 'You are successfully logged in'
-    else:
-        return 'Wrong password, try'
+    try:
+        form = flask.request.form
+        cursor = connection.cursor()
+        cursor.execute('''SELECT salt, password_hash
+                        FROM user_account
+                        WHERE email_address = %s''', (form['email'],))
+        #TODO first check if user exists
+        user_data = cursor.fetchone()
+        if user_data:
+            salt, hash_memoryview = user_data
+        else:
+            return 'No user with that email'
+        stored_hash = hash_memoryview.tobytes()
+        if salt and auth.check_password_hash(stored_hash, form['password'], salt):
+            flask.session['email'] = form['email']
+            return flask.redirect(flask.url_for('dashboard'))
+        else:
+            return f'Wrong password {form["password"]}, try'
+    except Exception as e:
+        app.logger.error('Login handler failed', exc_info=e)
+        return 'Error'
 
 @app.route('/signup')
 def get_signup():
@@ -44,6 +59,7 @@ def post_signup():
     email_address = form['email']
     salt = os.urandom(512)
     password_hash, salt = auth.generate_password_hash(form['password'])
+    print(form['password'], password_hash, salt)
     cursor = connection.cursor()
     cursor.execute('''SELECT user_key
                       FROM user_account
@@ -56,7 +72,7 @@ def post_signup():
                         password_hash,
                         salt              
                     ) VALUES (%s, %s, %s);''', (email_address, password_hash, salt))
-    cursor.commit()
+    connection.commit()
     return f'Successful user creation for {email_address}'
 
 @app.route('/img/<path>')
@@ -71,3 +87,7 @@ def serve_css(path: str):
 @app.route('/js/<path>')
 def serve_js(path: str):
     return flask.send_from_directory('public/js', path)
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return flask.render_template('error', message='Sorry, the page you are looking for was not found.', error=error)
