@@ -29,7 +29,6 @@ def post_login():
         cursor.execute('''SELECT salt, password_hash
                         FROM user_account
                         WHERE email_address = %s''', (form['email'],))
-        #TODO first check if user exists
         user_data = cursor.fetchone()
         if user_data:
             salt, hash_memoryview = user_data
